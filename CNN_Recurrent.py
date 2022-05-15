@@ -442,7 +442,7 @@ def test_rcnn(batch_size, seq_len, rcnn, testloader, max_y):
 # dwns_factor = [dwns_factor]
 
 
-# In[ ]:
+
 
 
 # Exercises in dataset
