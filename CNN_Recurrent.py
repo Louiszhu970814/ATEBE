@@ -456,7 +456,7 @@ fs = 256.0
 dwns_factor = [fs//256.0, fs//30.0, fs//15.0, fs//10.0, fs//5.0]
 
 
-epochs = [i for i in range(0,600,50)]
+epochs = [i for i in range(10,600,20)]
 # File Directory for data
 fileDir='./Data/wrist'
 
@@ -516,11 +516,15 @@ for epoch in epochs:
             'error': str(error)
             })
 
-        json = js.dumps(error_msg)
-        f = open('./Results/'+str(256.0//int(d))+str(epoch)+'Hz_errors.json','w')
-        f.write(json)
-        f.close()
+        # json = js.dumps(error_msg)
+        # f = open('./Results/'+str(256.0//int(d))+str(epoch)+'Hz_errors.json','w')
+        # f.write(json)
+        # f.close()
 
+json = js.dumps(error_msg)
+f = open('./Results/'+str(256.0//int(d))+str(epoch)+'Hz_errors.json','w')
+f.write(json)
+f.close()
 
 # ## Load Back Results
 
