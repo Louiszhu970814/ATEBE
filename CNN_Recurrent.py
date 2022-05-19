@@ -337,7 +337,7 @@ def dataloaders(rcnn, ppg, target, batch_size):
 # In[ ]:
 
 
-def train(epochs, batch_size, seq_len, rcnn, trainloader, optimizer, loss_func):
+def train(epochs, batch_size, seq_len, rcnn, trainloader, optimizer, loss_func, error_msg, exer, frequency):
     num_epochs = epochs
 
     total_loss = []
@@ -369,10 +369,21 @@ def train(epochs, batch_size, seq_len, rcnn, trainloader, optimizer, loss_func):
                       (epoch + 1, num_epochs, i + 1, running_loss / 10))
                 total_loss.append(running_loss/10)
                 running_loss = 0.0
+        if epoch%20==0:
+            error = test_rcnn(batch_size, seq_len, rcnn, testloader, max_y)
+        
+            print("Error: " +str(error))
 
+            error_msg['hr_errors'].append({
+            'exercise': str(exer),
+            'batch_size': str(batch_size),
+            'frequency': str(frequency)+'Hz',
+            'error': str(error)
+            })
+            
     print('Finished Training...')
     
-    return rcnn
+    return error_msg
 
 
 # ## Test RCNN for HR Error Rate
@@ -456,75 +467,74 @@ fs = 256.0
 dwns_factor = [fs//256.0, fs//30.0, fs//15.0, fs//10.0, fs//5.0]
 
 
-epochs = [i for i in range(10,600,20)]
+epoch = 600
 # File Directory for data
 fileDir='./Data/wrist'
 
 downsample=True
 error_msg = {}
 error_msg['hr_errors'] = []
-for epoch in epochs:
-    for exer in exercise:
-        for d in dwns_factor:
-            # Load Data
-            PPG, ECG = load_data(fileDir, exer)
+for exer in exercise:
+    for d in dwns_factor:
+        # Load Data
+        PPG, ECG = load_data(fileDir, exer)
             # Preprocess Data
-            d = int(d)
+        d = int(d)
 
-            if d == 1:
-              downsample == False
-            else:
-              downsample == True
+        if d == 1:
+          downsample == False
+        else:
+          downsample == True
 
-            ppg, ecg = preprocess_PPG_ECG(PPG, ECG, downsample=downsample, ds_factor=d)
+        ppg, ecg = preprocess_PPG_ECG(PPG, ECG, downsample=downsample, ds_factor=d)
 
             # Fix batching as dataset is not balanced
             # Can choose any of the values in the comments - this will affect results
 
-            if exer == 'high':  # 28, 30, 35, 36, 42, 45
-              batch_size = 28 
-            elif exer == 'low': # 34, 51
-              batch_size = 34
-            elif exer == 'run': # 26, 28, 52, 56
-              batch_size = 28
-            else:               # 37, 59
-              batch_size = 37
+        if exer == 'high':  # 28, 30, 35, 36, 42, 45
+          batch_size = 28 
+        elif exer == 'low': # 34, 51
+          batch_size = 34
+        elif exer == 'run': # 26, 28, 52, 56
+          batch_size = 28
+        else:               # 37, 59
+          batch_size = 37
 
 
-            seq_len = len(ppg[0,:])
+        seq_len = len(ppg[0,:])
 
             # Get ECG HR Ground Truth
-            ecg_groundTruth, max_y =  gt_ECG(ecg)
+        ecg_groundTruth, max_y =  gt_ECG(ecg)
 
-            # Call RCNN Model
-            # You can specify Conv-Pooling params in call
-            # Your choice should be dependent on  seq_len
-            rcnn = call_RCNN(seq_len, batch_size)
+        # Call RCNN Model
+        # You can specify Conv-Pooling params in call
+        # Your choice should be dependent on  seq_len
+        rcnn = call_RCNN(seq_len, batch_size)
+        # Set up data into train/test splits with targets
+        optimizer, loss_func, trainloader, testloader = dataloaders(rcnn, ppg, ecg_groundTruth, batch_size)
+        # Train the model
+        error_msg =  train(epoch, batch_size, seq_len, rcnn, trainloader, optimizer, loss_func, error_msg, exer, frequency=fs//d)
+        # Test the model/estimate HRE
+        # error = test_rcnn(batch_size, seq_len, trained_rcnn, testloader, max_y)
+        
+        # print("Error: " +str(error))
 
-            # Set up data into train/test splits with targets
-            optimizer, loss_func, trainloader, testloader = dataloaders(rcnn, ppg, ecg_groundTruth, batch_size)
-            # Train the model
-            trained_rcnn =  train(epoch, batch_size, seq_len, rcnn, trainloader, optimizer, loss_func)
-            # Test the model/estimate HRE
-            error = test_rcnn(batch_size, seq_len, trained_rcnn, testloader, max_y)
-            print("Error: " +str(error))
+        # error_msg['hr_errors'].append({
+        # 'exercise': str(exer),
+        # 'batch_size': str(batch_size),
+        # 'frequency': str(fs//d)+'Hz',
+        # 'error': str(error)
+        # })
+    
+        json = js.dumps(error_msg)
+        f = open('./Results/'+'errors.json','w')
+        f.write(json)
+        f.close()
 
-            error_msg['hr_errors'].append({
-            'exercise': str(exer),
-            'batch_size': str(batch_size),
-            'frequency': str(fs//d)+'Hz',
-            'error': str(error)
-            })
-
-        # json = js.dumps(error_msg)
-        # f = open('./Results/'+str(256.0//int(d))+str(epoch)+'Hz_errors.json','w')
-        # f.write(json)
-        # f.close()
-
-json = js.dumps(error_msg)
-f = open('./Results/'+str(256.0//int(d))+str(epoch)+'Hz_errors.json','w')
-f.write(json)
-f.close()
+# json = js.dumps(error_msg)
+# f = open('./Results/'+str(256.0//int(d))+str(epoch)+'Hz_errors.json','w')
+# f.write(json)
+# f.close()
 
 # ## Load Back Results
 
