@@ -6,14 +6,14 @@ import matplotlib.pyplot as plt
 # each has five line 256 32 15 10 5
 
 
-with open('5.0550Hz_errors.json', newline='') as jsonfile:
+with open('errors.json', newline='') as jsonfile:
     data = js.load(jsonfile)
     data_key = data['hr_errors']
     high={'256.0Hz':[], '32.0Hz':[], '15.0Hz':[], '10.0Hz':[], '5.0Hz':[]}
     low={'256.0Hz':[], '32.0Hz':[], '15.0Hz':[], '10.0Hz':[], '5.0Hz':[]}
     run={'256.0Hz':[], '32.0Hz':[], '15.0Hz':[], '10.0Hz':[], '5.0Hz':[]}
     walk={'256.0Hz':[], '32.0Hz':[], '15.0Hz':[], '10.0Hz':[], '5.0Hz':[]}
-    epochs=[i for i in range(50,600,50)]
+    epochs=[i for i in range(20,600,20)]
 
     for result in data_key:
         if result["exercise"]=="high":
@@ -67,8 +67,7 @@ with open('5.0550Hz_errors.json', newline='') as jsonfile:
     plt.plot(epochs,high["256.0Hz"][1:],color=(255/255,0/255,0/255), label='256.0Hz')
     plt.plot(epochs,high["32.0Hz"][1:],color=(255/255,0/255,255/255), label='32.0Hz')
     plt.plot(epochs,high["15.0Hz"][1:],color=(255/255,255/255,0/255), label='15.0Hz')
-    plt.plot(epochs,high["10.0Hz"][1:],color=(0/255,0/255,255/255),label='10.0Hz')
-    plt.plot(epochs,high["10.0Hz"][1:],color=(0/255,0/255,255/255),label='5.0Hz')
+    plt.plot(epochs,high["10.0Hz"][1:],color=(0/255,0/255,255/255), label='10.0Hz')
     plt.legend(loc = 'upper right')
     plt.savefig("high.png")
 
@@ -80,8 +79,7 @@ with open('5.0550Hz_errors.json', newline='') as jsonfile:
     # plt.plot(epochs,low["256.0Hz"][1:],color=(255/255,0/255,0/255), label='256.0Hz')
     # plt.plot(epochs,low["32.0Hz"][1:],color=(255/255,0/255,255/255), label='32.0Hz')
     # plt.plot(epochs,low["15.0Hz"][1:],color=(255/255,255/255,0/255), label='15.0Hz')
-    # plt.plot(epochs,low["10.0Hz"][1:],color=(0/255,0/255,255/255),label='10.0Hz')
-    # plt.plot(epochs,low["10.0Hz"][1:],color=(0/255,0/255,255/255),label='5.0Hz')
+    # plt.plot(epochs,low["10.0Hz"][1:],color=(0/255,0/255,255/255), label='10.0Hz')
     # plt.legend(loc = 'upper right')
     # plt.savefig("low.png")
 
@@ -92,8 +90,7 @@ with open('5.0550Hz_errors.json', newline='') as jsonfile:
     # plt.plot(epochs,run["256.0Hz"][1:],color=(255/255,0/255,0/255), label='256.0Hz')
     # plt.plot(epochs,run["32.0Hz"][1:],color=(255/255,0/255,255/255), label='32.0Hz')
     # plt.plot(epochs,run["15.0Hz"][1:],color=(255/255,255/255,0/255), label='15.0Hz')
-    # plt.plot(epochs,run["10.0Hz"][1:],color=(0/255,0/255,255/255),label='10.0Hz')
-    # plt.plot(epochs,run["10.0Hz"][1:],color=(0/255,0/255,255/255),label='5.0Hz')
+    # plt.plot(epochs,run["10.0Hz"][1:],color=(0/255,0/255,255/255),l abel='10.0Hz')
     # plt.legend(loc = 'upper right')
     # plt.savefig("run.png")
 
@@ -104,8 +101,7 @@ with open('5.0550Hz_errors.json', newline='') as jsonfile:
     # plt.plot(epochs,walk["256.0Hz"][1:],color=(255/255,0/255,0/255),label='256.0Hz')
     # plt.plot(epochs,walk["32.0Hz"][1:],color=(255/255,0/255,255/255),label='32.0Hz')
     # plt.plot(epochs,walk["15.0Hz"][1:],color=(255/255,255/255,0/255),label='15.0Hz')
-    # plt.plot(epochs,walk["10.0Hz"][1:],color=(0/255,0/255,255/255),label='10.0Hz')
-    # plt.plot(epochs,walk["10.0Hz"][1:],color=(0/255,0/255,255/255),label='5.0Hz')
+    # plt.plot(epochs,walk["10.0Hz"][1:],color=(0/255,0/255,255/255), label='10.0Hz')
     # plt.legend(loc = 'upper right')
     # plt.savefig("walk.png")
 

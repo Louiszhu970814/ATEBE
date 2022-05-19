@@ -369,7 +369,7 @@ def train(epochs, batch_size, seq_len, rcnn, trainloader, testloader, optimizer,
                       (epoch + 1, num_epochs, i + 1, running_loss / 10))
                 total_loss.append(running_loss/10)
                 running_loss = 0.0
-        if epoch%20==0:
+        if epoch%10==0:
             error = test_rcnn(batch_size, seq_len, rcnn, testloader, max_y)
         
             print("Error: " +str(error))
@@ -467,7 +467,7 @@ fs = 256.0
 dwns_factor = [fs//256.0, fs//30.0, fs//15.0, fs//10.0]
 
 
-epoch = 600
+epoch = 700
 # File Directory for data
 fileDir='./Data/wrist'
 
@@ -527,7 +527,7 @@ for exer in exercise:
         # })
     
         json = js.dumps(error_msg)
-        f = open('./Results/'+'errors.json','w')
+        f = open('./Results/'+'errors_2.json','w')
         f.write(json)
         f.close()
 
