@@ -337,7 +337,7 @@ def dataloaders(rcnn, ppg, target, batch_size):
 # In[ ]:
 
 
-def train(epochs, batch_size, seq_len, rcnn, trainloader, optimizer, loss_func, error_msg, exer, frequency):
+def train(epochs, batch_size, seq_len, rcnn, trainloader, testloader, optimizer, loss_func, error_msg, exer, frequency):
     num_epochs = epochs
 
     total_loss = []
@@ -464,7 +464,7 @@ fs = 256.0
 # Downsampling Factor - can be computationally heavy to run through loop
 # with all dwns_factor at once, therefore select Downsample factor in cell above
 
-dwns_factor = [fs//256.0, fs//30.0, fs//15.0, fs//10.0, fs//5.0]
+dwns_factor = [fs//256.0, fs//30.0, fs//15.0, fs//10.0]
 
 
 epoch = 600
@@ -513,7 +513,7 @@ for exer in exercise:
         # Set up data into train/test splits with targets
         optimizer, loss_func, trainloader, testloader = dataloaders(rcnn, ppg, ecg_groundTruth, batch_size)
         # Train the model
-        error_msg =  train(epoch, batch_size, seq_len, rcnn, trainloader, optimizer, loss_func, error_msg, exer, frequency=fs//d)
+        error_msg =  train(epoch, batch_size, seq_len, rcnn, trainloader, testloader, optimizer, loss_func, error_msg, exer, frequency=fs//d)
         # Test the model/estimate HRE
         # error = test_rcnn(batch_size, seq_len, trained_rcnn, testloader, max_y)
         
