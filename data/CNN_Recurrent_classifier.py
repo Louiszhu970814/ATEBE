@@ -233,7 +233,7 @@ class RCNN(nn.Module):
         self.cv4_out = int(((self.cv3_out - self.cv4_k)/self.cv4_s) + 1)
     
         self.layer_1 = nn.Sequential(
-          nn.Conv1d(in_channels=1, out_channels=3, kernel_size=(self.cv1_k), stride=(self.cv1_s)),
+          nn.Conv1d(in_channels=1, out_channels=5, kernel_size=(self.cv1_k), stride=(self.cv1_s)),
           nn.BatchNorm1d(num_features=3),
           nn.ReLU(inplace=True),
           nn.AvgPool1d(kernel_size=1)
@@ -246,12 +246,12 @@ class RCNN(nn.Module):
           nn.AvgPool1d(kernel_size=1)
         )
         
-        self.layer_hidden = nn.Sequential(
-          nn.Conv1d(in_channels=4, out_channels=5, kernel_size=(self.cv2_k), stride=(self.cv2_s)),
-          nn.BatchNorm1d(num_features=5),
-          nn.ReLU(inplace=True),
-          nn.AvgPool1d(kernel_size=1)
-        )
+        # self.layer_hidden = nn.Sequential(
+        #   nn.Conv1d(in_channels=4, out_channels=5, kernel_size=(self.cv2_k), stride=(self.cv2_s)),
+        #   nn.BatchNorm1d(num_features=5),
+        #   nn.ReLU(inplace=True),
+        #   nn.AvgPool1d(kernel_size=1)
+        # )
 
         self.layer_3 = nn.Sequential(
           nn.Conv1d(in_channels=5, out_channels=8, kernel_size=(self.cv3_k), stride=(self.cv3_s)),
@@ -472,10 +472,10 @@ fs = 256.0
 # Downsampling Factor - can be computationally heavy to run through loop
 # with all dwns_factor at once, therefore select Downsample factor in cell above
 
-dwns_factor = [fs//256.0, fs//30.0, fs//15.0, fs//10.0]
+dwns_factor = [fs//10.0]
 
 
-epoch = 700
+epoch = 150
 # File Directory for data
 fileDir='./Data/wrist'
 

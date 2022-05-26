@@ -13,7 +13,7 @@ with open('errors_2.json', newline='') as jsonfile:
     low={'256.0Hz':[], '32.0Hz':[], '15.0Hz':[], '10.0Hz':[], '5.0Hz':[]}
     run={'256.0Hz':[], '32.0Hz':[], '15.0Hz':[], '10.0Hz':[], '5.0Hz':[]}
     walk={'256.0Hz':[], '32.0Hz':[], '15.0Hz':[], '10.0Hz':[], '5.0Hz':[]}
-    epochs=[i for i in range(10,700,10)]
+    epochs=[i for i in range(1,700)]
 
     for result in data_key:
         if result["exercise"]=="high":

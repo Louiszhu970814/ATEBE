@@ -169,6 +169,7 @@ import numpy as np
 a = [[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15],[16,17,18,19,20]]
 a=np.array(a)
 a = a[:,::2]
+a 
 print(a)
 
 
@@ -369,17 +370,16 @@ def train(epochs, batch_size, seq_len, rcnn, trainloader, testloader, optimizer,
                       (epoch + 1, num_epochs, i + 1, running_loss / 10))
                 total_loss.append(running_loss/10)
                 running_loss = 0.0
-        if epoch%10==0:
-            error = test_rcnn(batch_size, seq_len, rcnn, testloader, max_y)
-        
-            print("Error: " +str(error))
-
-            error_msg['hr_errors'].append({
-            'exercise': str(exer),
-            'batch_size': str(batch_size),
-            'frequency': str(frequency)+'Hz',
-            'error': str(error)
-            })
+        # if epoch%10==0:
+        error = test_rcnn(batch_size, seq_len, rcnn, testloader, max_y)
+    
+        print("Error: " +str(error))
+        error_msg['hr_errors'].append({
+        'exercise': str(exer),
+        'batch_size': str(batch_size),
+        'frequency': str(frequency)+'Hz',
+        'error': str(error)
+        })
             
     print('Finished Training...')
     
@@ -464,16 +464,16 @@ fs = 256.0
 # Downsampling Factor - can be computationally heavy to run through loop
 # with all dwns_factor at once, therefore select Downsample factor in cell above
 
-dwns_factor = [fs//256.0, fs//30.0, fs//15.0, fs//10.0]
-
+# dwns_factor = [fs//256.0, fs//30.0, fs//15.0, fs//10.0]
+dwns_factor = [fs//10]                           
 
 epoch = 700
 # File Directory for data
 fileDir='./Data/wrist'
 
 downsample=True
-error_msg = {}
-error_msg['hr_errors'] = []
+error_msg = {'hr_errors':[]}
+
 for exer in exercise:
     for d in dwns_factor:
         # Load Data
@@ -526,10 +526,40 @@ for exer in exercise:
         # 'error': str(error)
         # })
     
-        json = js.dumps(error_msg)
-        f = open('./Results/'+'errors_2.json','w')
-        f.write(json)
-        f.close()
+        # json = js.dumps(error_msg)
+        # f = open('./Results/'+'errors_2.json','w')
+        # f.write(json)
+        # f.close()
+
+## plot the result 
+
+data_key = error_msg['hr_errors']
+high={f'{dwns_factor[0]}':[]}
+low={f'{dwns_factor[0]}':[]}
+run={f'{dwns_factor[0]}':[]}
+walk={f'{dwns_factor[0]}':[]}
+epochs=[i for i in range(1,700)]
+
+for result in data_key:
+    if result["exercise"]=="high":
+        high[f'{dwns_factor[0]}'].append(round(float(result["error"]),2))
+    elif result["exercise"]=="low":
+        low[f'{dwns_factor[0]}'].append(round(float(result["error"]),2))      
+    elif result["exercise"]=="run":
+        run[f'{dwns_factor[0]}'].append(round(float(result["error"]),2))
+    else:
+        walk[f'{dwns_factor[0]}'].append(round(float(result["error"]),2))
+
+plt.title("Error rate vs Epochs")
+plt.ylabel("Error rate")
+plt.xlabel("Epochs")
+plt.plot(epochs,run[f'{dwns_factor[0]}'][1:],color=(255/255,0/255,0/255),label='run')
+plt.plot(epochs,low[f'{dwns_factor[0]}'][1:],color=(255/255,0/255,255/255),label='low')
+plt.plot(epochs,high[f'{dwns_factor[0]}'][1:],color=(255/255,255/255,0/255),label='high')
+plt.plot(epochs,walk[f'{dwns_factor[0]}'][1:],color=(0/255,0/255,255/255), label='walk')
+plt.legend(loc = 'upper right')
+plt.savefig("Error rate vs Epochs.png")
+
 
 # json = js.dumps(error_msg)
 # f = open('./Results/'+str(256.0//int(d))+str(epoch)+'Hz_errors.json','w')
