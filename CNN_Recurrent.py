@@ -235,7 +235,7 @@ class RCNN(nn.Module):
         self.cv4_out = int(((self.cv3_out - self.cv4_k)/self.cv4_s) + 1)
     
         self.layer_1 = nn.Sequential(
-          nn.Conv1d(in_channels=1, out_channels=5, kernel_size=(self.cv1_k), stride=(self.cv1_s)),
+          nn.Conv1d(in_channels=1, out_channels=3, kernel_size=(self.cv1_k), stride=(self.cv1_s)),
           nn.BatchNorm1d(num_features=3),
           nn.ReLU(inplace=True),
           nn.AvgPool1d(kernel_size=1)
