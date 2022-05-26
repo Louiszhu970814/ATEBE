@@ -369,8 +369,8 @@ fs = 256.0
 # dwns_factor = [fs//256.0, fs//30.0, fs//15.0, fs//10.0]
 dwns_factor = [fs//10]                           
 
-epoch = 700
-max_hidden_num = 2
+epoch = 500
+max_hidden_num = 10
 # File Directory for data
 fileDir='./Data/wrist'
 
