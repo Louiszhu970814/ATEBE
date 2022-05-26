@@ -215,6 +215,7 @@ class RCNN(nn.Module):
         super(RCNN, self).__init__()
     
         self.input_size = input_size
+        self.hidden_layer = 3
     
         self.cv1_k = cv1_k
         self.cv1_s = cv1_s
@@ -246,15 +247,15 @@ class RCNN(nn.Module):
           nn.AvgPool1d(kernel_size=1)
         )
         
-        # self.layer_hidden = nn.Sequential(
-        #   nn.Conv1d(in_channels=4, out_channels=5, kernel_size=(self.cv2_k), stride=(self.cv2_s)),
-        #   nn.BatchNorm1d(num_features=5),
-        #   nn.ReLU(inplace=True),
-        #   nn.AvgPool1d(kernel_size=1)
-        # )
+        self.layer_hidden = nn.Sequential(
+          nn.Conv1d(in_channels=4, out_channels=4, kernel_size=(self.cv2_k), stride=(self.cv2_s)),
+          nn.BatchNorm1d(num_features=4),
+          nn.ReLU(inplace=True),
+          nn.AvgPool1d(kernel_size=1)
+        )
 
         self.layer_3 = nn.Sequential(
-          nn.Conv1d(in_channels=5, out_channels=8, kernel_size=(self.cv3_k), stride=(self.cv3_s)),
+          nn.Conv1d(in_channels=4, out_channels=8, kernel_size=(self.cv3_k), stride=(self.cv3_s)),
           nn.BatchNorm1d(num_features=8),
           nn.ReLU(inplace=True)
         )
@@ -274,7 +275,8 @@ class RCNN(nn.Module):
     def forward(self, x):
         x = self.layer_1(x) 
         x = self.layer_2(x)
-        x = self.layer_hidden(x)
+        for i in range(self.hidden_layer):
+            x = self.layer_hidden(x)
         x = self.layer_3(x)
         x = self.layer_4(x)
         x = x.view(x.size(0), -1)
