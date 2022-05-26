@@ -379,7 +379,6 @@ downsample=True
 plt.title("Error rate vs Epochs")
 plt.ylabel("Error rate")
 plt.xlabel("Epochs")
-plt.legend(loc = 'upper right')
 plot_color=['r','b','g','c','m','y','k','tomato','gold','lime','seagreen']
 
 for hidden in range(max_hidden_num):
@@ -542,8 +541,8 @@ for hidden in range(max_hidden_num):
     # plt.plot(epochs,run[f'{dwns_factor[0]}'][1:],color=(255/255,0/255,0/255),label='run')
     # plt.plot(epochs,low[f'{dwns_factor[0]}'][1:],color=(255/255,0/255,255/255),label='low')
     # plt.plot(epochs,high[f'{dwns_factor[0]}'][1:],color=(255/255,255/255,0/255),label='high')
-    plt.plot(epochs,walk[f'{dwns_factor[0]}'][1:],color=plot_color[hidden], label=f'hidden {hidden}')
-    
+    plt.plot(epochs,walk[f'{dwns_factor[0]}'][1:],color=plot_color[hidden], label=str(hidden))
+    plt.legend(loc = 'upper right')
 plt.savefig("Error rate vs Epochs.png")
 
 
