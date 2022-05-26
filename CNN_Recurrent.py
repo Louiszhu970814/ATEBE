@@ -1,33 +1,4 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# # CNNs for Heart Rate Estimation and Human Activity Recognition in Wrist Worn Sensing Applications
-
-# This is code for reproducing the CNNR HRE results shown in the paper presented at the WristSense workshop as part of PerCom 2020.
-# 
-# This repository will be broken down as shown in the Figure 1 below.
-
-# ![](./Block_Diagram_LS.png)
-# 
-# Figure 1. *Block diagram of our processing approach*
-
-# ## Data Collection
-
-# The data was collected by [D. Jarchi and A. Casson (2017)](https://www.mdpi.com/2306-5729/2/1/1) and downloaded from [PhysioNet](https://physionet.org/content/wrist/1.0.0/).
-# 
-# After running `Download_Data.ipynb` the data will be downloaded and stored in the directory `'/CNNs_HAR_and_HR/Data/wrist/'`
-
-# ### Using Google Colaboratory - (Recommended Working Environment)
-
-# You can run this notebook on Colab using the following cell to mount your drive and install some dependencies
-
-# You may need to install some of these packages below
-
-# In[8]:
-
-
 import os
-
 import wfdb
 from wfdb import processing
 

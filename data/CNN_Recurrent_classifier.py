@@ -1,33 +1,4 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# # CNNs for Heart Rate Estimation and Human Activity Recognition in Wrist Worn Sensing Applications
-
-# This is code for reproducing the CNNR HRE results shown in the paper presented at the WristSense workshop as part of PerCom 2020.
-# 
-# This repository will be broken down as shown in the Figure 1 below.
-
-# ![](./Block_Diagram_LS.png)
-# 
-# Figure 1. *Block diagram of our processing approach*
-
-# ## Data Collection
-
-# The data was collected by [D. Jarchi and A. Casson (2017)](https://www.mdpi.com/2306-5729/2/1/1) and downloaded from [PhysioNet](https://physionet.org/content/wrist/1.0.0/).
-# 
-# After running `Download_Data.ipynb` the data will be downloaded and stored in the directory `'/CNNs_HAR_and_HR/Data/wrist/'`
-
-# ### Using Google Colaboratory - (Recommended Working Environment)
-
-# You can run this notebook on Colab using the following cell to mount your drive and install some dependencies
-
-# You may need to install some of these packages below
-
-# In[8]:
-
-
 import os
-
 import wfdb
 from wfdb import processing
 
@@ -169,6 +140,7 @@ import numpy as np
 a = [[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15],[16,17,18,19,20]]
 a=np.array(a)
 a = a[:,::2]
+a 
 print(a)
 
 
@@ -208,81 +180,7 @@ def gt_ECG(ecg):
 # In[ ]:
 
 
-class RCNN(nn.Module):
-    def __init__(self, input_size, batch_size, n_features, 
-                 cv1_k, cv1_s, cv2_k, cv2_s,
-                 cv3_k, cv3_s, cv4_k, cv4_s):
-        super(RCNN, self).__init__()
-    
-        self.input_size = input_size
-        self.hidden_layer = 3
-    
-        self.cv1_k = cv1_k
-        self.cv1_s = cv1_s
-        self.cv1_out = int(((self.input_size - self.cv1_k)/self.cv1_s) + 1)
 
-        self.cv2_k = cv2_k
-        self.cv2_s = cv2_s
-        self.cv2_out = int(((self.cv1_out - self.cv2_k)/self.cv2_s) + 1)
-
-        self.cv3_k = cv3_k
-        self.cv3_s = cv3_s
-        self.cv3_out = int(((self.cv2_out - self.cv3_k)/self.cv3_s) + 1)
-
-        self.cv4_k = cv4_k
-        self.cv4_s = cv4_s
-        self.cv4_out = int(((self.cv3_out - self.cv4_k)/self.cv4_s) + 1)
-    
-        self.layer_1 = nn.Sequential(
-          nn.Conv1d(in_channels=1, out_channels=5, kernel_size=(self.cv1_k), stride=(self.cv1_s)),
-          nn.BatchNorm1d(num_features=3),
-          nn.ReLU(inplace=True),
-          nn.AvgPool1d(kernel_size=1)
-        )
-
-        self.layer_2 = nn.Sequential(
-          nn.Conv1d(in_channels=3, out_channels=4, kernel_size=(self.cv2_k), stride=(self.cv2_s)),
-          nn.BatchNorm1d(num_features=4),
-          nn.ReLU(inplace=True),
-          nn.AvgPool1d(kernel_size=1)
-        )
-        
-        self.layer_hidden = nn.Sequential(
-          nn.Conv1d(in_channels=4, out_channels=4, kernel_size=(self.cv2_k), stride=(self.cv2_s)),
-          nn.BatchNorm1d(num_features=4),
-          nn.ReLU(inplace=True),
-          nn.AvgPool1d(kernel_size=1)
-        )
-
-        self.layer_3 = nn.Sequential(
-          nn.Conv1d(in_channels=4, out_channels=8, kernel_size=(self.cv3_k), stride=(self.cv3_s)),
-          nn.BatchNorm1d(num_features=8),
-          nn.ReLU(inplace=True)
-        )
-
-        self.layer_4 = nn.Sequential(
-          nn.Conv1d(in_channels=8, out_channels=10, kernel_size=(self.cv4_k), stride=(self.cv4_s)),
-          nn.BatchNorm1d(num_features=10),
-          nn.ReLU(inplace=True),
-          nn.Dropout(p=0.5, inplace=False)
-        )
-
-        self.layer_5 = nn.Sequential(
-          nn.Linear(self.cv4_out*10, 20), # FC Layer
-          nn.Linear(20, 1) # Regression
-        )
-        
-    def forward(self, x):
-        x = self.layer_1(x) 
-        x = self.layer_2(x)
-        for i in range(self.hidden_layer):
-            x = self.layer_hidden(x)
-        x = self.layer_3(x)
-        x = self.layer_4(x)
-        x = x.view(x.size(0), -1)
-        x = self.layer_5(x)
-    
-        return x
 
 
 # In[ ]:
@@ -379,17 +277,16 @@ def train(epochs, batch_size, seq_len, rcnn, trainloader, testloader, optimizer,
                       (epoch + 1, num_epochs, i + 1, running_loss / 10))
                 total_loss.append(running_loss/10)
                 running_loss = 0.0
-        if epoch%10==0:
-            error = test_rcnn(batch_size, seq_len, rcnn, testloader, max_y)
-        
-            print("Error: " +str(error))
-
-            error_msg['hr_errors'].append({
-            'exercise': str(exer),
-            'batch_size': str(batch_size),
-            'frequency': str(frequency)+'Hz',
-            'error': str(error)
-            })
+        # if epoch%10==0:
+        error = test_rcnn(batch_size, seq_len, rcnn, testloader, max_y)
+    
+        print("Error: " +str(error))
+        error_msg['hr_errors'].append({
+        'exercise': str(exer),
+        'batch_size': str(batch_size),
+        'frequency': str(frequency)+'Hz',
+        'error': str(error)
+        })
             
     print('Finished Training...')
     
@@ -467,82 +364,197 @@ def test_rcnn(batch_size, seq_len, rcnn, testloader, max_y):
 
 
 # Exercises in dataset
-exercise = ['high', 'low', 'run', 'walk']
+# exercise = ['high', 'low', 'run', 'walk']
+exercise = ['walk']
 # Original sampling frequency
 fs = 256.0
 
 # Downsampling Factor - can be computationally heavy to run through loop
 # with all dwns_factor at once, therefore select Downsample factor in cell above
 
-dwns_factor = [fs//10.0]
+# dwns_factor = [fs//256.0, fs//30.0, fs//15.0, fs//10.0]
+dwns_factor = [fs//10]                           
 
-
-epoch = 150
+epoch = 700
+max_hidden_num = 10
 # File Directory for data
 fileDir='./Data/wrist'
 
 downsample=True
-error_msg = {}
-error_msg['hr_errors'] = []
-for exer in exercise:
-    for d in dwns_factor:
-        # Load Data
-        PPG, ECG = load_data(fileDir, exer)
-            # Preprocess Data
-        d = int(d)
 
-        if d == 1:
-          downsample == False
+plt.title("Error rate vs Epochs")
+plt.ylabel("Error rate")
+plt.xlabel("Epochs")
+plt.legend(loc = 'upper right')
+plot_color=['r','b','g','c','m','y','k','tomato','gold','lime','seagreen']
+
+for hidden in range(max_hidden_num):
+    error_msg = {'hr_errors':[]}
+    class RCNN(nn.Module):
+        def __init__(self, input_size, batch_size, n_features, 
+                     cv1_k, cv1_s, cv2_k, cv2_s,
+                     cv3_k, cv3_s, cv4_k, cv4_s):
+            super(RCNN, self).__init__()
+
+            self.input_size = input_size
+            self.hidden_layer = hidden
+
+            self.cv1_k = cv1_k
+            self.cv1_s = cv1_s
+            self.cv1_out = int(((self.input_size - self.cv1_k)/self.cv1_s) + 1)
+
+            self.cv2_k = cv2_k
+            self.cv2_s = cv2_s
+            self.cv2_out = int(((self.cv1_out - self.cv2_k)/self.cv2_s) + 1)
+
+            self.cv3_k = cv3_k
+            self.cv3_s = cv3_s
+            self.cv3_out = int(((self.cv2_out - self.cv3_k)/self.cv3_s) + 1)
+
+            self.cv4_k = cv4_k
+            self.cv4_s = cv4_s
+            self.cv4_out = int(((self.cv3_out - self.cv4_k)/self.cv4_s) + 1)
+
+            self.layer_1 = nn.Sequential(
+              nn.Conv1d(in_channels=1, out_channels=3, kernel_size=(self.cv1_k), stride=(self.cv1_s)),
+              nn.BatchNorm1d(num_features=3),
+              nn.ReLU(inplace=True),
+              nn.AvgPool1d(kernel_size=1)
+            )
+
+            self.layer_2 = nn.Sequential(
+              nn.Conv1d(in_channels=3, out_channels=4, kernel_size=(self.cv2_k), stride=(self.cv2_s)),
+              nn.BatchNorm1d(num_features=4),
+              nn.ReLU(inplace=True),
+              nn.AvgPool1d(kernel_size=1)
+            )
+
+            self.layer_hidden = nn.Sequential(
+              nn.Conv1d(in_channels=4, out_channels=4, kernel_size=(self.cv2_k), stride=(self.cv2_s)),
+              nn.BatchNorm1d(num_features=4),
+              nn.ReLU(inplace=True),
+              nn.AvgPool1d(kernel_size=1)
+            )
+
+            self.layer_3 = nn.Sequential(
+              nn.Conv1d(in_channels=4, out_channels=8, kernel_size=(self.cv3_k), stride=(self.cv3_s)),
+              nn.BatchNorm1d(num_features=8),
+              nn.ReLU(inplace=True)
+            )
+
+            self.layer_4 = nn.Sequential(
+              nn.Conv1d(in_channels=8, out_channels=10, kernel_size=(self.cv4_k), stride=(self.cv4_s)),
+              nn.BatchNorm1d(num_features=10),
+              nn.ReLU(inplace=True),
+              nn.Dropout(p=0.5, inplace=False)
+            )
+
+            self.layer_5 = nn.Sequential(
+              nn.Linear(self.cv4_out*10, 20), # FC Layer
+              nn.Linear(20, 1) # Regression
+            )
+
+        def forward(self, x):
+            x = self.layer_1(x) 
+            x = self.layer_2(x)
+            for i in range(self.hidden_layer):
+                x = self.layer_hidden(x)
+            x = self.layer_3(x)
+            x = self.layer_4(x)
+            x = x.view(x.size(0), -1)
+            x = self.layer_5(x)
+
+            return x
+
+
+
+
+    for exer in exercise:
+        for d in dwns_factor:
+            # Load Data
+            PPG, ECG = load_data(fileDir, exer)
+                # Preprocess Data
+            d = int(d)
+
+            if d == 1:
+              downsample == False
+            else:
+              downsample == True
+
+            ppg, ecg = preprocess_PPG_ECG(PPG, ECG, downsample=downsample, ds_factor=d)
+
+                # Fix batching as dataset is not balanced
+                # Can choose any of the values in the comments - this will affect results
+
+            if exer == 'high':  # 28, 30, 35, 36, 42, 45
+              batch_size = 28 
+            elif exer == 'low': # 34, 51
+              batch_size = 34
+            elif exer == 'run': # 26, 28, 52, 56
+              batch_size = 28
+            else:               # 37, 59
+              batch_size = 37
+
+
+            seq_len = len(ppg[0,:])
+
+                # Get ECG HR Ground Truth
+            ecg_groundTruth, max_y =  gt_ECG(ecg)
+
+            # Call RCNN Model
+            # You can specify Conv-Pooling params in call
+            # Your choice should be dependent on  seq_len
+            rcnn = call_RCNN(seq_len, batch_size)
+            # Set up data into train/test splits with targets
+            optimizer, loss_func, trainloader, testloader = dataloaders(rcnn, ppg, ecg_groundTruth, batch_size)
+            # Train the model
+            error_msg =  train(epoch, batch_size, seq_len, rcnn, trainloader, testloader, optimizer, loss_func, error_msg, exer, frequency=fs//d)
+            # Test the model/estimate HRE
+            # error = test_rcnn(batch_size, seq_len, trained_rcnn, testloader, max_y)
+
+            # print("Error: " +str(error))
+
+            # error_msg['hr_errors'].append({
+            # 'exercise': str(exer),
+            # 'batch_size': str(batch_size),
+            # 'frequency': str(fs//d)+'Hz',
+            # 'error': str(error)
+            # })
+
+            # json = js.dumps(error_msg)
+            # f = open('./Results/'+'errors_2.json','w')
+            # f.write(json)
+            # f.close()
+
+    ## plot the result 
+    data_key = error_msg['hr_errors']
+    high={f'{dwns_factor[0]}':[]}
+    low={f'{dwns_factor[0]}':[]}
+    run={f'{dwns_factor[0]}':[]}
+    walk={f'{dwns_factor[0]}':[]}
+    epochs=[i for i in range(1,epoch)]
+
+    for result in data_key:
+        if result["exercise"]=="high":
+            high[f'{dwns_factor[0]}'].append(round(float(result["error"]),2))
+        elif result["exercise"]=="low":
+            low[f'{dwns_factor[0]}'].append(round(float(result["error"]),2))      
+        elif result["exercise"]=="run":
+            run[f'{dwns_factor[0]}'].append(round(float(result["error"]),2))
         else:
-          downsample == True
-
-        ppg, ecg = preprocess_PPG_ECG(PPG, ECG, downsample=downsample, ds_factor=d)
-
-            # Fix batching as dataset is not balanced
-            # Can choose any of the values in the comments - this will affect results
-
-        if exer == 'high':  # 28, 30, 35, 36, 42, 45
-          batch_size = 28 
-        elif exer == 'low': # 34, 51
-          batch_size = 34
-        elif exer == 'run': # 26, 28, 52, 56
-          batch_size = 28
-        else:               # 37, 59
-          batch_size = 37
+            walk[f'{dwns_factor[0]}'].append(round(float(result["error"]),2))
 
 
-        seq_len = len(ppg[0,:])
-
-            # Get ECG HR Ground Truth
-        ecg_groundTruth, max_y =  gt_ECG(ecg)
-
-        # Call RCNN Model
-        # You can specify Conv-Pooling params in call
-        # Your choice should be dependent on  seq_len
-        rcnn = call_RCNN(seq_len, batch_size)
-        # Set up data into train/test splits with targets
-        optimizer, loss_func, trainloader, testloader = dataloaders(rcnn, ppg, ecg_groundTruth, batch_size)
-        # Train the model
-        error_msg =  train(epoch, batch_size, seq_len, rcnn, trainloader, testloader, optimizer, loss_func, error_msg, exer, frequency=fs//d)
-        # Test the model/estimate HRE
-        # error = test_rcnn(batch_size, seq_len, trained_rcnn, testloader, max_y)
-        
-        # print("Error: " +str(error))
-
-        # error_msg['hr_errors'].append({
-        # 'exercise': str(exer),
-        # 'batch_size': str(batch_size),
-        # 'frequency': str(fs//d)+'Hz',
-        # 'error': str(error)
-        # })
+    # plt.plot(epochs,run[f'{dwns_factor[0]}'][1:],color=(255/255,0/255,0/255),label='run')
+    # plt.plot(epochs,low[f'{dwns_factor[0]}'][1:],color=(255/255,0/255,255/255),label='low')
+    # plt.plot(epochs,high[f'{dwns_factor[0]}'][1:],color=(255/255,255/255,0/255),label='high')
+    plt.plot(epochs,walk[f'{dwns_factor[0]}'][1:],color=plot_color[hidden], label=f'hidden {hidden}')
     
-        json = js.dumps(error_msg)
-        f = open('./Results/'+'errors_2.json','w')
-        f.write(json)
-        f.close()
+plt.savefig("Error rate vs Epochs.png")
 
-# json = js.dumps(error_msg)
-# f = open('./Results/'+str(256.0//int(d))+str(epoch)+'Hz_errors.json','w')
+
+    # json = js.dumps(error_msg)
+    # f = open('./Results/'+str(256.0//int(d))+str(epoch)+'Hz_errors.json','w')
 # f.write(json)
 # f.close()
 
