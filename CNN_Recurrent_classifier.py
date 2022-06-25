@@ -552,7 +552,7 @@ for hidden in range(max_hidden_num):
     epochs=[i for i in range(1,epoch)]
 
     
-    print("min= "+min)
+
 
     for result in data_key:
         if result["exercise"]=="high":
