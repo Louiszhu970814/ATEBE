@@ -239,7 +239,7 @@ def dataloaders(rcnn, ppg, target, batch_size):
 # In[ ]:
 
 
-def train(epochs, batch_size, seq_len, rcnn, trainloader, testloader, optimizer, loss_func, error_msg, exer, frequency):
+def train(epochs, batch_size, seq_len, rcnn, trainloader, testloader, optimizer, loss_func, error_msg, exer, frequency, min):
     num_epochs = epochs
 
     total_loss = []
@@ -273,7 +273,8 @@ def train(epochs, batch_size, seq_len, rcnn, trainloader, testloader, optimizer,
                 running_loss = 0.0
         # if epoch%10==0:
         error = test_rcnn(batch_size, seq_len, rcnn, testloader, max_y)
-    
+        if error<min:
+            min = error
         print("Error: " +str(error))
         error_msg['hr_errors'].append({
         'exercise': str(exer),
@@ -284,7 +285,7 @@ def train(epochs, batch_size, seq_len, rcnn, trainloader, testloader, optimizer,
             
     print('Finished Training...')
     
-    return error_msg
+    return error_msg,min
 
 
 # ## Test RCNN for HR Error Rate
@@ -486,6 +487,7 @@ for hidden in range(max_hidden_num):
     for exer in exercise:
         for d in dwns_factor:
             # Load Data
+            min = 1000
             PPG, ECG = load_data(fileDir, exer)
                 # Preprocess Data
             d = int(d)
@@ -522,7 +524,8 @@ for hidden in range(max_hidden_num):
             # Set up data into train/test splits with targets
             optimizer, loss_func, trainloader, testloader = dataloaders(rcnn, ppg, ecg_groundTruth, batch_size)
             # Train the model
-            error_msg =  train(epoch, batch_size, seq_len, rcnn, trainloader, testloader, optimizer, loss_func, error_msg, exer, frequency=fs//d)
+            
+            error_msg,min =  train(epoch, batch_size, seq_len, rcnn, trainloader, testloader, optimizer, loss_func, error_msg, exer, frequency=fs//d)
             # Test the model/estimate HRE
             # error = test_rcnn(batch_size, seq_len, trained_rcnn, testloader, max_y)
 
@@ -549,7 +552,7 @@ for hidden in range(max_hidden_num):
     epochs=[i for i in range(1,epoch)]
 
     
-    min = 100
+    print("min= "+min)
 
     for result in data_key:
         if result["exercise"]=="high":
@@ -560,10 +563,9 @@ for hidden in range(max_hidden_num):
             run[f'{dwns_factor[0]}'].append(round(float(result["error"]),2))
         else:
             walk[f'{dwns_factor[0]}'].append(round(float(result["error"]),2))
-        if result["error"]<min:
-            min = result["error"]
+    
 
-
+    print(min)
     # plt.plot(epochs,run[f'{dwns_factor[0]}'][1:],color=(255/255,0/255,0/255),label='run')
     # plt.plot(epochs,low[f'{dwns_factor[0]}'][1:],color=(255/255,0/255,255/255),label='low')
     # plt.plot(epochs,high[f'{dwns_factor[0]}'][1:],color=(255/255,255/255,0/255),label='high')
