@@ -525,7 +525,7 @@ for hidden in range(max_hidden_num):
             optimizer, loss_func, trainloader, testloader = dataloaders(rcnn, ppg, ecg_groundTruth, batch_size)
             # Train the model
             
-            error_msg,min =  train(epoch, batch_size, seq_len, rcnn, trainloader, testloader, optimizer, loss_func, error_msg, exer, frequency=fs//d)
+            error_msg,min =  train(epoch, batch_size, seq_len, rcnn, trainloader, testloader, optimizer, loss_func, error_msg, exer, frequency=fs//d, min=min)
             # Test the model/estimate HRE
             # error = test_rcnn(batch_size, seq_len, trained_rcnn, testloader, max_y)
 
