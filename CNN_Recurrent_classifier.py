@@ -548,6 +548,9 @@ for hidden in range(max_hidden_num):
     walk={f'{dwns_factor[0]}':[]}
     epochs=[i for i in range(1,epoch)]
 
+    
+    min = 100
+
     for result in data_key:
         if result["exercise"]=="high":
             high[f'{dwns_factor[0]}'].append(round(float(result["error"]),2))
@@ -557,6 +560,8 @@ for hidden in range(max_hidden_num):
             run[f'{dwns_factor[0]}'].append(round(float(result["error"]),2))
         else:
             walk[f'{dwns_factor[0]}'].append(round(float(result["error"]),2))
+        if result["error"]<min:
+            min = result["error"]
 
 
     # plt.plot(epochs,run[f'{dwns_factor[0]}'][1:],color=(255/255,0/255,0/255),label='run')
