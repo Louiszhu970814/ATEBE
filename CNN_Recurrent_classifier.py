@@ -370,7 +370,7 @@ fs = 256.0
 dwns_factor = [fs//10]                           
 
 epoch = 200
-max_hidden_num = 10
+max_hidden_num = 1
 # File Directory for data
 fileDir='./Data/wrist'
 
@@ -457,28 +457,28 @@ for hidden in range(max_hidden_num):
 
 
         # # CNN R
-        def forward(self, x):
-            x = self.layer_1(x) 
-            x = self.layer_2(x)
+      #  def forward(self, x):
+      #      x = self.layer_1(x) 
+     #       x = self.layer_2(x)
         #     for i in range(self.hidden_layer):
         #         x = self.layer_hidden(x)
-            x = self.layer_3(x)
-            x = self.layer_4(x)
-            x = x.view(x.size(0), -1)
-            x = self.layer_5(x)
-            return x
+      #      x = self.layer_3(x)
+      #      x = self.layer_4(x)
+      #      x = x.view(x.size(0), -1)
+      #      x = self.layer_5(x)
+      #      return x
 
         ## CNN-LSTM
-        #def forward(self,x):
-        #    x = self.layer_1(x) 
-        #    x = self.layer_2(x)
-         #   x = self.layer_3(x)
-         #   x = self.layer_4(x)
+        def forward(self,x):
+            x = self.layer_1(x) 
+            x = self.layer_2(x)
+            x = self.layer_3(x)
+            x = self.layer_4(x)
            # x = x.permute(0, 2, 1)
-         #   x, _ = self.LSTM(x)
-          #  x = self.fc(x)
-           # x = x[:, -1, :]
-            #return x
+            x, _ = self.LSTM(x)
+            x = self.fc(x)
+            x = x[:, -1, :]
+            return x
 
 
 
