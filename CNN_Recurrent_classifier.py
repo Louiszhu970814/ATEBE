@@ -448,7 +448,8 @@ for hidden in range(max_hidden_num):
               nn.Linear(20, 1) # Regression
             )
 
-            self.LSTM = nn.LSTM(input_size=self.cv4_out, hidden_size=100,num_layers=3, batch_first=True)
+            self.LSTM = nn.LSTM(input_size=self.cv4_out, hidden_size=200,num_layers=3, batch_first=True)
+            self.LSTM2 = nn.LSTM(input_size=200,hidden_size=100, num_layers=3, batch_first=True)
             self.fc = nn.Sequential(
                 nn.Linear(100,20),
                 nn.Linear(20,1)
@@ -458,28 +459,29 @@ for hidden in range(max_hidden_num):
 
 
         # # CNN R
-        def forward(self, x):
-            x = self.layer_1(x) 
-            x = self.layer_2(x)
-        #     for i in range(self.hidden_layer):
-        #         x = self.layer_hidden(x)
-            x = self.layer_3(x)
-            x = self.layer_4(x)
-            x = x.view(x.size(0), -1)
-            x = self.layer_5(x)
-            return x
-
-        ## CNN-LSTM
-#        def forward(self,x):
+#        def forward(self, x):
 #            x = self.layer_1(x) 
 #            x = self.layer_2(x)
+        #     for i in range(self.hidden_layer):
+        #         x = self.layer_hidden(x)
 #            x = self.layer_3(x)
 #            x = self.layer_4(x)
-           # x = x.permute(0, 2, 1)
-#            x, _ = self.LSTM(x)
-#            x = self.fc(x)
-#            x = x[:, -1, :]
+#            x = x.view(x.size(0), -1)
+#            x = self.layer_5(x)
 #            return x
+
+        ## CNN-LSTM
+        def forward(self,x):
+            x = self.layer_1(x) 
+            x = self.layer_2(x)
+            x = self.layer_3(x)
+            x = self.layer_4(x)
+           # x = x.permute(0, 2, 1)
+            x, _ = self.LSTM(x)
+            x, _ = self.LSTM2(x)
+            x = self.fc(x)
+            x = x[:, -1, :]
+            return x
 
 
 
